@@ -7,7 +7,7 @@ SR = 44100.0
 
 print '''SR = %.0f Hz.''' % SR
 
-def play(ar, normalize=0.25):
+def play(ar, level=0.25):
     '''Play the array as a wave through pygame, normalized to a level 0..1.'''
     global SR
     pygame.mixer.quit()
@@ -19,16 +19,16 @@ def play(ar, normalize=0.25):
         print "ERR: array must be 1D (mono) or 2D (stereo) with two colums."
         return
 
-    sound = pygame.sndarray.make_sound(wav_float_to_int16(ar, normalize))
+    sound = pygame.sndarray.make_sound(wav_float_to_int16(ar, level * 32767))
     channel = sound.play()
     return channel
     
 def stop():
     pygame.mixer.stop()
 
-def wav_float_to_int16(ar, normalize=1.0):
-    '''Convert float array to int16 array, normalized to a level 0..1.'''
-    return normalize(ar, level=32767).astype('int16')
+def wav_float_to_int16(ar, level=32760):
+    '''Convert float array to int16 array, normalized to a level 0..32767.'''
+    return normalize(ar, level=level).astype('int16')
 
 def wavread(infile):
     '''Load a WAV, normalized to 1.0.'''
@@ -40,10 +40,10 @@ def wavread(infile):
         print '''SR = %.0f Hz.''' % SR    
     return normalize(wav, 1.0)
     
-def wavwrite(ar, outfile):
-    '''Write a WAV, normalized to 1.0.'''
+def wavwrite(ar, outfile, level=32760):
+    '''Write a WAV, normalized.'''
     global SR
-    wavfile.write(outfile, SR, wav_float_to_int16(ar))
+    wavfile.write(outfile, SR, wav_float_to_int16(ar, level))
 
 def normalize(ar, level=1.0):
     return ar * (float(level) / abs(ar).max())
