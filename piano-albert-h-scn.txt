@@ -1,0 +1,14 @@
+--------------------------------------------------
+(C.4) Freq = 261.56Hz, C.3 + -0.4 cents
+(C#4) Freq = 277.61Hz, C#3 +  2.7 cents interval =  1.0
+(D.4) Freq = 292.91Hz, D.3 + -4.5 cents interval =  0.9
+(D#4) Freq = 310.99Hz, D#3 + -0.8 cents interval =  1.0
+(E.4) Freq = 329.90Hz, E.3 +  1.4 cents interval =  1.0
+(F.4) Freq = 348.11Hz, F.3 + -5.6 cents interval =  0.9
+(F#4) Freq = 369.55Hz, F#3 + -2.1 cents interval =  1.0
+(G.4) Freq = 391.95Hz, G.3 + -0.2 cents interval =  1.0
+(G#4) Freq = 414.95Hz, G#3 + -1.5 cents interval =  1.0
+(A.4) Freq = 440.05Hz, A.3 +  0.2 cents interval =  1.0
+(A#4) Freq = 466.32Hz, A#3 +  0.6 cents interval =  1.0
+(B.4) Freq = 494.55Hz, B.3 +  2.3 cents interval =  1.0
+(C.5) Freq = 528.70Hz, C.4 + 17.9 cents interval =  1.2

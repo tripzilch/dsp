@@ -1,0 +1,42 @@
+---------+------------------------------------------------- piano-hertogjan-scn
+000. C.3 | 262.31Hz   C.3  +4.52 cents
+001. C#3 | 277.79Hz   C#3  +3.81 cents   interval = 0.99
+002. D.3 | 292.96Hz   D.3  -4.16 cents   interval = 0.92
+003. D#3 | 309.94Hz   D#3  -6.64 cents   interval = 0.98
+004. E.3 | 328.13Hz   E.3  -7.88 cents   interval = 0.99
+005. F.3 | 346.25Hz   F.3 -14.81 cents   interval = 0.93
+006. F#3 | 368.36Hz   F#3  -7.67 cents   interval = 1.07
+007. G.3 | 390.19Hz   G.3  -7.97 cents   interval = 1.00
+008. G#3 | 413.94Hz   G#3  -5.69 cents   interval = 1.02
+009. A.3 | 438.23Hz   A.3  -7.00 cents   interval = 0.99
+010. A#3 | 466.90Hz   A#3  +2.75 cents   interval = 1.10
+011. B.3 | 496.72Hz   B.3  +9.93 cents   interval = 1.07
+012. C.4 | 526.30Hz   C.4 +10.05 cents   interval = 1.00
+---------+------------------------------------------------- piano-collar-collard-scn
+000. C.3 | 189.64Hz   F#2 +42.88 cents
+001. C#3 | 201.83Hz   G#2 -49.21 cents   interval = 1.08
+002. D.3 | 211.62Hz   G#2 +32.74 cents   interval = 0.82
+003. D#3 | 223.22Hz   A.2 +25.13 cents   interval = 0.92
+004. E.3 | 232.54Hz   A#2  -4.06 cents   interval = 0.71
+005. F.3 | 241.92Hz   B.2 -35.54 cents   interval = 0.69
+006. F#3 | 258.07Hz   C.3 -23.66 cents   interval = 1.12
+007. G.3 | 277.93Hz   C#3  +4.66 cents   interval = 1.28
+008. G#3 | 294.77Hz   D.3  +6.49 cents   interval = 1.02
+009. A.3 | 309.58Hz   D#3  -8.63 cents   interval = 0.85
+010. A#3 | 325.76Hz   E.3 -20.42 cents   interval = 0.88
+011. B.3 | 337.19Hz   E.3 +39.28 cents   interval = 0.60
+012. C.4 | 370.88Hz   F#3  +4.14 cents   interval = 1.65
+---------+------------------------------------------------- piano-albert-h-scn
+000. C.3 | 261.56Hz   C.3  -0.41 cents
+001. C#3 | 277.61Hz   C#3  +2.67 cents   interval = 1.03
+002. D.3 | 292.91Hz   D.3  -4.45 cents   interval = 0.93
+003. D#3 | 310.99Hz   D#3  -0.78 cents   interval = 1.04
+004. E.3 | 329.90Hz   E.3  +1.45 cents   interval = 1.02
+005. F.3 | 348.11Hz   F.3  -5.55 cents   interval = 0.93
+006. F#3 | 369.55Hz   F#3  -2.08 cents   interval = 1.03
+007. G.3 | 391.95Hz   G.3  -0.18 cents   interval = 1.02
+008. G#3 | 414.95Hz   G#3  -1.47 cents   interval = 0.99
+009. A.3 | 440.05Hz   A.3  +0.21 cents   interval = 1.02
+010. A#3 | 466.32Hz   A#3  +0.58 cents   interval = 1.00
+011. B.3 | 494.55Hz   B.3  +2.35 cents   interval = 1.02
+012. C.4 | 528.70Hz   C.4 +17.93 cents   interval = 1.16

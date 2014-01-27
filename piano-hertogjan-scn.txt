@@ -1,0 +1,15 @@
+---------+------------------------------------------------- piano-hertogjan-scn
+000. C.3 | 262.31Hz   C.3  +4.52 cents
+001. C#3 | 277.79Hz   C#3  +3.81 cents   interval = 0.99
+002. D.3 | 292.96Hz   D.3  -4.16 cents   interval = 0.92
+003. D#3 | 309.94Hz   D#3  -6.64 cents   interval = 0.98
+004. E.3 | 328.13Hz   E.3  -7.88 cents   interval = 0.99
+005. F.3 | 346.25Hz   F.3 -14.81 cents   interval = 0.93
+006. F#3 | 368.36Hz   F#3  -7.67 cents   interval = 1.07
+007. G.3 | 390.19Hz   G.3  -7.97 cents   interval = 1.00
+008. G#3 | 413.94Hz   G#3  -5.69 cents   interval = 1.02
+009. A.3 | 438.23Hz   A.3  -7.00 cents   interval = 0.99
+010. A#3 | 466.90Hz   A#3  +2.75 cents   interval = 1.10
+011. B.3 | 496.72Hz   B.3  +9.93 cents   interval = 1.07
+012. C.4 | 526.30Hz   C.4 +10.05 cents   interval = 1.00
+
