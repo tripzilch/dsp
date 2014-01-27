@@ -1,11 +1,15 @@
-# these two scripts contain some utility functions, they are currently only used for reading the wav file (which scipy can also do)
+# these two scripts contain some utility functions, they are currently only used for reading the 
+# wav file (which scipy can also do)
 # and generating a nice sounding supersaw synth buzz carrier tone
 get_ipython().magic('run -i midi.py')
 get_ipython().magic('run -i wavtools.py')
 
 '''
-A vocoder is a device that uses a filterbank of bandpass filters to split the modulator signal (voice) into frequency bands. For each of these bands, their individual amplitude envelope is tracked. 
-An identical filterbank then splits the carrier signal (often a harmonically rich synth buzz sound), and each of those frequency bands is then individually amplitude-modulated with the corresponding amplitude envelope. These signals are then recombined --> ROBOT VOICE
+A vocoder is a device that uses a filterbank of bandpass filters to split the modulator signal (voice) into 
+frequency bands. For each of these bands, their individual amplitude envelope is tracked. 
+An identical filterbank then splits the carrier signal (often a harmonically rich synth buzz sound), and 
+each of those frequency bands is then individually amplitude-modulated with the corresponding amplitude 
+envelope. These signals are then recombined --> ROBOT VOICE
 
 '''
 
