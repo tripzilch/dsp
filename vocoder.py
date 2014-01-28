@@ -3,6 +3,7 @@
 # and generating a nice sounding supersaw synth buzz carrier tone
 get_ipython().magic('run -i midi.py')
 get_ipython().magic('run -i wavtools.py')
+C = NOTES()
 
 '''
 A vocoder is a device that uses a filterbank of bandpass filters to split the modulator signal (voice) into 
@@ -27,12 +28,17 @@ def cos_win(n, L=None):
 # modulator (voice)
 mod = wavread('/home/ritz/monsters2.wav')
 # carrier (saw synth buzz)
-car = r_[saw_pad(C.E3, 53000, ADSR=(500,1,1,500)),
-         saw_pad(C.A2, 73000, ADSR=(500,1,1,500))]
+#car = r_[saw_pad(C.E3, 53000, ADSR=(500,1,1,500)),
+#         saw_pad(C.A2, 73000, ADSR=(500,1,1,500))]
 # window size, determines number of freq bands
 W = 1024
 # step size, determines sensitivity of env tracking
 step = 512
+# consonant detection params
+vowel_range = 3200 * WW / sr
+fudge = 500
+consonant_level = 10.0
+consonant_exp = 1.5
 
 WW = max(W, 2 * step)
 w_in = cos_win(W, WW)
@@ -50,12 +56,28 @@ print "Vocoding the shit out of %.2fs of sound." % (L / sr)
 print "window size = %d, giving about %.1f frequency bands." % (W, sr / W)
 print "step size = %d = %.1fms" % (step, 1000 * step / sr)
 out = zeros(L)
-for i in range(0, L - WW, step):
-    i_ = slice(i * step, i * step + W)
+irange = range(0, L - WW, step)
+spectro = empty((WW, len(irange)))
+coco = empty(len(irange))
+for ii,i in enumerate(irange):
     mod_fft = fft(mod[i:i+WW] * w_in)
-    car_fft = fft(car[i:i+WW] * w_out)
-    voc = real(ifft(abs(mod_fft) * car_fft))
+    mod_sd = abs(mod_fft)
+    car_chunk = array(car[i:i+WW])
+    consonance = (sum(mod_sd[vowel_range:WW-vowel_range]) / (fudge + sum(mod_sd))) ** consonant_exp
+    coco[ii] = consonance
+    car_chunk += (rand(WW) - 0.5) * consonance * consonant_level
+    car_fft = fft(car_chunk * w_out)
+    voc = real(ifft(mod_sd * car_fft))
     out[i:i+WW] += voc * w_out
+    spectro[:, ii] = mod_sd
 
 play(out)
+spec2 = (spectro[:WW/2:, :] + spectro[:WW/2-1:-1, :])
+imshow(spec2 ** .5, aspect='auto', cmap=cmap_funk, origin='lower')
+
+plot(0,0)
+plot(coco * 512)
+axis([0, spec2.shape[1], 0, spec2.shape[0]])
+
+show()
 
