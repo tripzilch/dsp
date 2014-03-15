@@ -123,8 +123,9 @@ def saw_pad(NN, L=80000, fullness=9, sep=0, ADSR=(3000, 10000, .6, 15000)):
     A,D,S,R = ADSR
     ENV = interp(arange(L),[0,A,A+D,L-R,L-1],[0,1,S,S,0])
     for i in range(fullness):
-        for ni,n in enumerate(NN):
-            SAW = I * (freq(n + rand() * .04 - .02) / sr)
+        detune = ((float(i) / fullness) - 0.5) * .04
+        for ni,n in enumerate(NN):            
+            SAW = I * (freq(n + detune) / sr)
             SAW += rand()
             SAW %= 1.0
             SAW -= 0.5
