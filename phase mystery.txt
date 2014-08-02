@@ -1,0 +1,29 @@
+>  Which leaves out a fair portion about what audio really is to the human brain, whether or not you perfect its reproduction mathematically.
+
+Hey I have a question, it's kinda off-topic but maybe someone reading this thread can answer this for me. Your comment made me think about this because I'm not sure if the effect I'm hearing is subjective, psycho-acoustic, physical or mathematical in nature.
+
+I've been coding my own audio-synthesis toys on and off as a hobby for over a decade now, I like to believe I understand a thing or two about it :)
+
+A little while back I wrote some very simple code to synthesize waveforms from the summation of sine-waves. 
+
+Summing sine-waves of frequencies 1..N with amplitudes 1/N produces a very nice bandlimited sawtooth waveform. This works, it sounds crisp, like a sawtooth, exactly what you'd expect.
+
+Then I started thinking about phases. This is the important part: I have always understood that the human ear cannot perceive phase. I'm specifically talking about a mono signal (no L/R phase differences), perceived through a headphone (no interfering room acoustics), a continuous waveform (so any phase-shift only happens modulo 2pi maximum).
+
+Obviously shifting the phases linearly with respect to the frequency just results in the same sawtooth wave shifted in time. Works exactly as expected, no audible differences.
+
+So I continued with other ways of meddling with the phases, which resulted in radically different-looking waveforms. Adding a constant amount gives you a kind of comb-like impulse train with rounded bottoms. Setting the phase to frequency squared (times pi/3 or pi/5) gives you some really funky pointy looking shapes. Frequency cubed (again times pi / some integer constant) looks like a sum of a series of sloped square waves. Picking a (fixed) random phase for every component, gives something noisy-looking (but periodical, of course).
+
+Pretty cool, really. FFT analysis of these waveforms confirms they still have exactly the same frequency components as a regular sawtooth wave. I triple checked, it works exactly as intended.
+
+But here comes the twist: they *sound* different!
+
+I checked on headphones, speakers, at varying levels of volume/amplitude to see if there was any non-linearities causing the difference in sound somewhere along the signal chain (nope, they sound different in exactly the same manner regardless of amplitude). If I had to describe he difference, I'd say they sound a bit more "hollow", in the sense that a square-wave sounds hollow, but not quite (and they obviously still have all their harmonics). It's not a subtle difference though, I can hear it very clearly.
+
+What gives? I thought we couldn't hear phase, only phase differences, and phase cancellations? As in, only when one phase interferes with another, along the same frequency.
+
+It kinda upsets the very foundations on which my whole mental model of audio DSP has been based: phase is irrelevant, *unless* either: A) phase shift is large enough to cause an audible delay, B) phase difference between left and right ear, C) two signals interfering with phases on the same frequencies, or D) you're doing some non-linear post processing. And I've never really seen anything written about it in literature, otherwise.
+
+Anyone got an idea? How can a steady periodic signal sound different even if the frequency components amplitudes stay the same, but only the phases are shifted? And in what way does this affect the sound, I have a fairly good intuition of how frequency amplitudes change the sound (EQ, filtering), but not the phases.
+
+It's a mystery! (well, to me)
