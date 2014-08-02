@@ -62,7 +62,7 @@ if __name__ == "__main__":
     # pk = pk[10500:11000] # optionally slice a portion of the input file
     
     # process the thing
-    on, zx, zxt, code = process(x)
+    on, zx, zxt, packets = process(x)
     
     # plot pretty graphs
     
