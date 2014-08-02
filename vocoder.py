@@ -35,7 +35,7 @@ def sigmoid(x, treshold=0.25, p=36):
     return 1 / (1 + exp((-x + treshold) * p))
 
 # modulator (voice)
-mod = wavread('/home/ritz/mix/penis.wav')
+mod = wavread('/home/gup/Downloads/back.wav', to_mono=True)
 # carrier (saw synth buzz)
 #car = r_[saw_pad(C.E3, 53000, fullness=25, ADSR=(500,1,1,500)),
 #         saw_pad(C.A2, 73000, ADSR=(500,1,1,500))]
@@ -88,10 +88,10 @@ for ii,i in enumerate(irange):
     out[i:i + WW] += voc * w_out
     spectro[:, ii] = mod_sd
 
-play(out)
+#play(out)
 spec2 = (spectro[:WWh:, :] + spectro[:WWh - 1:-1, :])
 clf()
-imshow(spec2 ** .5, aspect='auto', cmap=cmap_funk, origin='lower')
+imshow(spec2 ** .5, aspect='auto', origin='lower')
 
 plot(0,0)
 plot(coco * 512)
