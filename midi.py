@@ -1,3 +1,4 @@
+import itertools as it
 import numpy as np
 
 sr = 44100.0
@@ -74,23 +75,32 @@ class NOTES(object):
         add9        C E G D'
         
         
-        major               C D E F G A B C'
-        minor               C  D  D#  F  G  G#  A#  C'
-        harmonic_minor      C  D  D#  F  G  G#  B   C'
-        melodic_minor       C D D# F G A B C'
-        major_pentatonic    C D E G A C'
-        minor_pentatonic    C Eb F G Bb C'
-        whole_tone          C D E F# G# A# C'
-        blues               C  Eb  F  F#  G  Bb  C'
-        chromatic           C  C#  D  D#  E  F  F#  G  G#  A  A#  B  C'
+        major_pentatonic    C  D  E  G  A  C'
+        minor_pentatonic    C  Eb F  G  Bb C'
+        whole_tone          C  D  E  F# G# A# C'
+        blues_minor         C  Eb F  F# G  Bb C'
+        blues_major         C  D  D# E  G  A  C'
+        major               C  D  E  F  G  A  B  C'
+        minor               C  D  D# F  G  G# A# C'
+        harmonic_minor      C  D  D# F  G  G# B  C'
+        melodic_minor       C  D  D# F  G  A  B  C'
         
         ionian              C  D  E  F  G  A  B  C'
-        dorian              C  D  D#  F  G  A  A#  C'
-        phrygian            C  C#  D#  F  G  G#  A#  C'
-        lydian              C  D  E  F#  G  A  B  C'
-        mixolydian          C  D  E  F  G  A  A#  C'
-        aeolian             C  D  D#  F  G  G#  A#  C'
-        locrian             C  C#  D#  F  F#  G#  A#  C'
+        dorian              C  D  D# F  G  A  A# C'
+        phrygian            C  C# D# F  G  G# A# C'
+        lydian              C  D  E  F# G  A  B  C'
+        mixolydian          C  D  E  F  G  A  A# C'
+        aeolian             C  D  D# F  G  G# A# C'
+        locrian             C  C# D# F  F# G# A# C'
+
+        major_phrygian      C  Db E  F  G  Ab Bb C'
+        phrygian_dominant      C  Db E  F  G  Ab Bb C'
+
+
+        enigmatic           C  Db E  F# G# A# B  C'
+        overtone            C  D  E  F# G  A  Bb C'
+
+        chromatic           C  C# D  D# E  F  F# G  G# A  A# B  C'
         
     ========
     
@@ -100,17 +110,14 @@ class NOTES(object):
     Here's some more scales that I'm not 100% sure of their correctness, and
     as long as I don't need them I think it's better to not include them:
     
-        oriental            C Db E F Gb A Bb C'
-        double_harmonic     C Db E F G Ab B C'
-        enigmatic           C Db E F# G# A# B C'
-        major_phrygian      C Db E F G Ab Bb C'
-        byzantine           C Db E F G Ab B C'
-        persian             C Db E F Gb Ab B C'
-        major_locrian       C D E F Gb Ab Bb C'
-        lydian_minor        C D E F# G Ab Bb C'
-        overtone            C D E F# G A Bb C'
-        leading_whole_tone: C D E F# G# A# B C'
-        hindu               C D E F G Ab Bb C'
+        persian             C  Db E  F  Gb Ab B  C'
+        oriental            C  Db E  F  Gb A  Bb C'
+        double_harmonic     C  Db E  F  G  Ab B  C'
+        byzantine           C  Db E  F  G  Ab B  C'
+        major_locrian       C  D  E  F  Gb Ab Bb C'
+        hindu               C  D  E  F  G  Ab Bb C'
+        lydian_minor        C  D  E  F# G  Ab Bb C'
+        leading_whole_tone: C  D  E  F# G# A# B  C'
     
     """        
         
@@ -182,13 +189,15 @@ class NOTES(object):
 NOTES.chords = dict(line.strip().split(None,1) 
     for line in NOTES.__doc__.split('========')[-2].strip().split('\n') if line.strip())   
 
+C = N = NOTES()
+
 def freq(n): 
     if isinstance(n, NOTES):
         n = n.notes[0]
     return 440 * 2**((n - 69) / 12.0)
     
 def freq_to_note(f):
-    return 69 + 12 * log2(f / 440)
+    return 69 + 12 * np.log2(f / 440.0)
     
 def note(n):
     i = n
@@ -222,10 +231,26 @@ def period_sample_error(sr=sr):
     for n in range(48):
         f = freq(n)
         ww = sr / f
-        er = 100 * (log(sr / round(ww)) - log(f)) / log(2.0 ** (1.0/12))
+        er = 100 * (np.log(sr / round(ww)) - np.log(f)) / np.log(2.0 ** (1.0/12))
         d = (er,n,freq(n),note(n),ww)
         dd.append(d)
     dd.sort()
     for d in dd:
         print 'ERR %6.3f ct -- %3d -- %9.3f Hz -- %-4s -- %8.3f samples' % d
         
+def min12(a,b):
+    '''Minimal modulo 12 absolute difference.'''
+    return min(abs(a+12-b)%12, abs(a-b)%12, abs(a-b-12)%12)
+
+
+def chord_finder(notes, size=3, tres=1):
+    '''Find plausible chords of certain size by trying all combinations and 
+    sorting by minimum interval. Use threshold for filtering too-close chords.'''
+    
+    cc = (it.combinations(notes,size))
+    combb = ((it.combinations(ccc,2), ccc) for ccc in cc)
+    diffs = [(sorted((min12(a,b) for a,b in co)),n) for co,n in combb]
+    for dd,nn in sorted(diffs, reverse=True):
+        if dd[0] > 1:
+            print '%10s %10s' % (dd, NOTES(nn))
+

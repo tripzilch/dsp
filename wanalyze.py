@@ -1,11 +1,9 @@
-from wavtools import *
+from wav import *
+from plot import *
 from scipy import ndimage
+from os import path
 
-get_ipython().magic('run -i ../util/matplotlibsnippets.py')
-
-rc_set_dark_colourscheme()
 COLORS = rcParams['axes.color_cycle']
-
 putng = 81387.0
 
 def bubble(x,y,s,bc='#88aadd',c='#000000',ec='#000000',size=10,box_alpha=0.4,family='monospace',weight='bold'):
@@ -38,11 +36,12 @@ def track_envelope(wav, smoothing_factor=600):
     env = sqrt(ndimage.filters.gaussian_filter1d(env, smoothing_factor / 2))
     return env
     
-    
+   
 class WAnalyze(object):
     def __init__(self, fn):
         self.fn = fn
-        self.name = fn.rsplit('.',1)[0].rsplit('/',1)[-1] # todo: use os.path
+        # strip path and extension for plot name/title
+        self.name = path.splitext(path.split(fn)[1])[0] 
         self.w = wavread(fn, to_mono=True)        
         if self.w.size % 2:
             # for simpler fft hackery, make nr of samples even
@@ -97,8 +96,8 @@ class WAnalyze(object):
             sd = abs(ff)
             log_sd = log(sd)
             lsd_max, lsd_min = log_sd.max(), log_sd.min()
-            log_sd = maximum(log_sd, lsd_max - 10)
-            cepstrum = real(ifft(log_sd)[:wsize/2+1])
+            log_sd = maximum(log_sd, lsd_max - 10) # ???
+            cepstrum = real(ifft(log_sd)[:wsize // 2 + 1])
             
             self.cepstrogram[i, :] = prw(cepstrum)
         sca(self.axW)
@@ -119,6 +118,19 @@ class WAnalyze(object):
         axis([0, ws.size - 1, 0, wsize / 2 + 1])
         title('cepstrogram (window size=%d)' % wsize)
         tight_layout()
+
+    def chunked(self, x, window=hamming(3200), step=50):
+        'Yields windowed chunks of x.'
+        wlen = len(window)
+        for j in range(0, len(x) - wlen, step):
+            yield x[j:j + wsize] * window
+        # overlapping           [------+------]  ..  ..
+        # windows      [------+------]   [------+..  ..        [------+------]
+        # waveformwaveformwaveformwaveformwavefor..  ..rmwaveformwaveformwavefor
+        # bins            [---+---][---+---][---+..  ..-][---+---][---+---]
+        # xt = (self.bins_left[0] + (wsize - step) / 2.0 , self.bins_left[-1] + (wsize + step) / 2.0, wsize / 2 + 1, 0)
+
+
 
     def detect_freqs(self, max_freq=666.0):
         figure(3); clf()
@@ -167,3 +179,41 @@ class WAnalyze(object):
                 self.segments.append((left, i))
                 self.axB.plot([left,i],[mid,mid], lw=2, c=colorscheme[1])
         return self.segments
+
+class Chunker(object):
+    """Manage windowed chunks of waveform"""
+    def __init__(self, x, window=hamming(3200), step=50):                
+        self.x = x
+        self.window = window
+        self.wlen = len(window)
+        self.step = step
+        self.chunk_pos = range(0, len(x) - wlen, step)
+        self.fftlen = self.wlen // 2 + 1
+
+    def chunks(self):
+        for i in self.chunk_pos:
+            self.chunk = x[i:i + wsize] * window
+            yield self.chunk
+
+        # overlapping           [------+------]  ..  ..
+        # windows      [------+------]   [------+..  ..        [------+------]
+        # waveformwaveformwaveformwaveformwavefor..  ..rmwaveformwaveformwavefor
+        # bins            [---+---][---+---][---+..  ..-][---+---][---+---]
+        # xt = (self.bins_left[0] + (wsize - step) / 2.0 , self.bins_left[-1] + (wsize + step) / 2.0, wsize / 2 + 1, 0)
+                              
+    def ffts(self):
+        for c in self.chunks():
+            self.fft = rfft(c)
+            yield self.fft
+
+    def sds(self):
+        for f in self.ffts()
+            self.sd = real(f * conjugate(f))
+            yield self.sd
+        
+    def ac(self, i):
+        for s in self.sds()
+            self.ac = real(irfft(s)[:self.fftlen])
+            yield self.ac
+            
+    

@@ -1,8 +1,6 @@
-# these two scripts contain some utility functions, they are currently only used for reading the 
-# wav file (which scipy can also do)
-# and generating a nice sounding supersaw synth buzz carrier tone
-get_ipython().magic('run -i midi.py')
-get_ipython().magic('run -i wavtools.py')
+from midi import *
+from wav import *
+
 C = NOTES()
 
 '''
