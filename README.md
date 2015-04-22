@@ -1,12 +1,7 @@
 DSP scripts
 ===========
 
-This is where I collect my various soundbending scripts. Filters, compression, and the like.
+This is where I collect my various soundbending scripts. Filters, dynamic compression, vocoders. Analysis tools for speech, transients, rhythms, frequencies and melodies. Various plotting and visualisation routines.
 
-Needs IPython + pylab, and PyGame for sound output.
-
-wavtools.py
------------
-
-Utilities, reading writing and playing sound. Important global SR holds the sampling rate we're working at (default 44100Hz).
+Requires IPython + Pylab and PyGame for sound output.
 

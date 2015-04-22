@@ -25,7 +25,7 @@ def play(ar, level=0.25):
     sound = pygame.sndarray.make_sound(wav_float_to_int16(ar, level * 32767))
     channel = sound.play()
     return channel
-    
+
 def stop():
     pygame.mixer.stop()
 
@@ -36,11 +36,11 @@ def wav_float_to_int16(ar, level=32760):
 def wav_float_to_int32(ar, level=32760 * 32760):
     '''Convert float array to int32 array, normalized to a level 0..32767.'''
     return normalize(ar, level=level).astype('int32')
-    
+
 def read(infile, to_mono=False):
-    '''Load a WAV, normalized to 1.0, optionally converted to mono.'''    
+    '''Load a WAV, normalized to 1.0, optionally converted to mono.'''
     global sr
-    
+
     sr_, wav = wavfile.read(infile)
 
     if to_mono and wav.ndim == 2:
@@ -49,10 +49,10 @@ def read(infile, to_mono=False):
     sr_ = float(sr)
     if sr_ != sr:
         sr = sr_
-        print '''sr = %.0f Hz.''' % sr    
+        print '''sr = %.0f Hz.''' % sr
 
     return normalize(wav, 1.0)
-    
+
 def write(ar, outfile, level=32760 * 32760):
     '''Write a WAV, normalized.'''
     global sr
@@ -60,7 +60,7 @@ def write(ar, outfile, level=32760 * 32760):
 
 def normalize(ar, level=1.0):
     return ar * (float(level) / abs(ar).max())
-    
+
 
 def sine(f, phi, L):
     '''Returns L samples of a sinewave of frequency f (Hz) and phase phi.'''
@@ -81,21 +81,21 @@ def beep(freq_phase_amp, L):
     tmp = pl.empty(L)
     for f, p, a in freq_phase_amp:
         pl.multiply(ii, f * tau / sr, tmp)
-        pl.add(tmp, p, tmp)        
+        pl.add(tmp, p, tmp)
         pl.sin(tmp, tmp)
         pl.multiply(tmp, a, tmp)
         pl.add(res, tmp, res)
 
     return res
-    
+
 def generate_waveforms(
-    N_harmonics=[8,16,32,64], 
+    N_harmonics=[8,16,32,64],
     path='/home/ritz/mix/audio samples instruments/basic-waveforms/',
     name='square_rnd_phase-%03dh-G2-(i).wav'):
     '''Generate a series of basic additive waveforms with a varying number of harmonics.'''
     f0 = 49.0
     w0 = pl.round(sr / f0)
-    f0 = sr / w0    
+    f0 = sr / w0
     pl.clf()
     for ii, N in enumerate(N_harmonics):
         H = 1.0 + 2 * pl.arange(N)
@@ -107,7 +107,7 @@ def generate_waveforms(
 def ADSR((A, D, S, R)=(100, 500, .7, 100), L=2000):
     'ADSR envelope.'
     return pl.interp(pl.arange(L), [0, A, A+D, L-R, L-1], [0, 1, S, S, 0])
-        
+
 def saw_bass(n, L=4400, env=(100, 500, .7, 100), N_harmonics=32):
     '''Generate a sawtooth beep with ADSR envelope.'''
     H = 1.0 + pl.arange(N_harmonics)
@@ -133,9 +133,9 @@ def saw_pad(NN, L=80000, fullness=9, sep=0, env=(3000, 10000, .6, 15000)):
     ENV = ADSR(env, L)
     for i in range(fullness):
         detune = ((float(i) / fullness) - 0.5) * .04
-        for ni,n in enumerate(NN):            
-            SAW = I * (freq(n + detune) / sr)
-            SAW += rand()
+        for ni,n in enumerate(NN):
+            SAW = I * (midi.freq(n + detune) / sr)
+            SAW += pl.rand()
             SAW %= 1.0
             SAW -= 0.5
             SAW *= ENV

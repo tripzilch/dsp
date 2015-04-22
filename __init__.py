@@ -1,4 +1,4 @@
-__all__ = ["wplot", "wav", "midi", "chunker"]
+__all__ = ["chunker", "midi", "wav", "wplot"]
 
 #import wplot, wav, midi, chunker
 #from pylab import *
