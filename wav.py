@@ -88,6 +88,34 @@ def beep(freq_phase_amp, L):
 
     return res
 
+def asynth(f0, L, term_f = lambda f,k: f * k, term_a = lambda f,k: 1.0 / k, term_p=lambda f,k: 0.0, max_f=sr / 2):
+    '''Additive synthesis of sinewaves.
+
+    f0 -- base frequency.
+    L -- length in samples.
+    term_f, term_a, term_p -- functions to produce respectively the frequency,
+    amplitude and phases of sine terms. They are passed two arguments, the
+    base frequency f0 and the number of the harmonic. The defaults produce the
+    harmonics of a sawtooth wave.
+    max_f -- maximum frequency, defaults to to sr / 2 (Nyquist frequency).
+    '''
+    res = pl.zeros(L)
+    ii = pl.arange(L)
+    tmp = pl.empty(L)
+    H = 1
+    f = term_f(f0, H)
+    while f < max_f:
+        a = term_a(f0, H)
+        p = term_p(f0, H)
+        pl.multiply(ii, f * tau / sr, tmp)
+        pl.add(tmp, p, tmp)
+        pl.sin(tmp, tmp)
+        pl.multiply(tmp, a, tmp)
+        pl.add(res, tmp, res)
+        H += 1
+        f = term_f(f0, H)
+    return res
+
 def generate_waveforms(
     N_harmonics=[8,16,32,64],
     path='/home/ritz/mix/audio samples instruments/basic-waveforms/',

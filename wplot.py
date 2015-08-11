@@ -91,7 +91,7 @@ class Subplots(object):
         #self.current_axes.clear()
         self.current_axes.set(**self.ax_params)
         self.current_axes.set(**more_params)
-        print more_params
+        #print more_params
         #self._fig.tight_layout()
         return self.current_axes
 

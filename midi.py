@@ -96,7 +96,7 @@ class NOTES(object):
         locrian             C  C# D# F  F# G# A# C'
 
         major_phrygian      C  Db E  F  G  Ab Bb C'
-        phrygian_dominant      C  Db E  F  G  Ab Bb C'
+        phrygian_dominant   C  Db E  F  G  Ab Bb C'
 
 
         enigmatic           C  Db E  F# G# A# B  C'
@@ -242,8 +242,9 @@ def period_sample_error(sr=sr):
 
 def min12(a,b):
     '''Minimal modulo 12 absolute difference.'''
-    return min(abs(a+12-b)%12, abs(a-b)%12, abs(a-b-12)%12)
-
+    lo, hi = min(a,b) % 12, max(a,b) % 12
+    return min(hi - lo, 12 + lo - hi)
+    #return min(abs(a+12-b)%12, abs(a-b)%12, abs(a-b-12)%12)
 
 def chord_finder(notes, size=3, tres=1):
     '''Find plausible chords of certain size by trying all combinations and
