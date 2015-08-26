@@ -242,9 +242,8 @@ def period_sample_error(sr=sr):
 
 def min12(a,b):
     '''Minimal modulo 12 absolute difference.'''
-    lo, hi = min(a,b) % 12, max(a,b) % 12
-    return min(hi - lo, 12 + lo - hi)
-    #return min(abs(a+12-b)%12, abs(a-b)%12, abs(a-b-12)%12)
+    d = abs((a % 12) - (b % 12))
+    return min(d, 12 - d)
 
 def chord_finder(notes, size=3, tres=1):
     '''Find plausible chords of certain size by trying all combinations and
