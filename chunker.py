@@ -21,7 +21,7 @@ def prw(ar, p=0.5):
 
 def sigmoid(x, threshold=0.25, p=36):
     return 1 / (1 + exp((-x + threshold) * p))
-def elliot_sigmoid(x): return 1 / (1 + abs(x))
+def elliot_sigmoid(x): return x / (1 + abs(x))
 def d_elliot_sigmoid(x): return 1 / (1 + abs(x)) ** 2
 
 def kaiser_beta(beta):
