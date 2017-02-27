@@ -11,7 +11,7 @@ def rc_set_dark_colourscheme():
     colorscheme = ['#ccff00', '#0082ff', '#ff0037', '#00ff13', '#5e00ff',
         '#ffa800', '#00fff2', '#ff00c1', '#77ff00', '#002cff']
     rc('axes',facecolor='k', edgecolor='0.8', linewidth=1,
-        labelcolor='#ccff00', color_cycle=colorscheme,titlesize='small',labelsize='small')
+        labelcolor='#ccff00', color_cycle=colorscheme,titlesize='medium',labelsize='small')
     rc('grid',color='0.5')
     rc('text',color='#ccff00')
     rc('figure', facecolor='k',edgecolor='k')
@@ -19,7 +19,8 @@ def rc_set_dark_colourscheme():
     rc('xtick', color='#ccff00')
     rc('ytick', color='#ccff00')
     rc('image', interpolation='nearest')
-
+#  dash_capstyle: ['butt' | 'round' | 'projecting']
+#  dash_joinstyle: ['miter' | 'round' | 'bevel']
     cmap_funk = pl.mpl.colors.LinearSegmentedColormap.from_list('funk', [
         (0,(0,0,0)),
         (.5,(.8,1,0)),
@@ -29,6 +30,12 @@ def rc_set_dark_colourscheme():
         (.5,(0,0,0)),
         (.75,(.8,1,0)),
         (1.0,(1,1,1))])
+
+def fmtar(x, num=3, fmt='%.2f'):
+    'Format array.'
+    fmtn = ', '.join(num*[fmt]+['...']+num*[fmt])
+    rn = range(num) + range(-num, 0)
+    return fmtn % tuple(x[rn])
 
 def ax_wave(title='wave', auto=False):
     '''init nice axis for plotting waveforms'''

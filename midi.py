@@ -3,19 +3,18 @@ import numpy as np
 
 sr = 44100.0
 
-
 class NOTES(object):
     """A NOTES object represent a note, or a sequence/chord of notes.
 
     Initialized with no arguments produces a single C in octave 0:
 
         >>> C = N = NOTES()
-        >>> print C
+        >>> print(C)
         C
 
     You can make chords or scales:
 
-        >>> print C.maj
+        >>> print(C.maj)
         C  E  G
 
     You can use all sorts of notations:
@@ -37,7 +36,7 @@ class NOTES(object):
     You can do the same arithmetic on chords or sequences, which functions in
     principle like a numpy.array with the notes in integer notation:
 
-        >>> print C.min + N.A
+        >>> print(C.min + N.A)
         A  C' E'
 
     Concatenate chords or sequences using the | operator:
@@ -124,22 +123,29 @@ class NOTES(object):
     """
 
     def __init__(self, notes='C'):
-        if isinstance(notes, basestring):
-            self.notes = tuple(
+        if isinstance(notes, str):
+            notes = tuple(
                 'CCDDEFFGGAAB'.index(n[0])
                 + ('#' in n) + ('s' in n)
                 - ('b' in n) - ('f' in n)
                 + 12 * (1 + "123456789".find(n[-1]))
                 for n in notes.replace("'","1").strip().split())
         elif isinstance(notes, int):
-            self.notes = (notes,)
-        else:
-            self.notes = tuple(notes)
+            notes = (notes,)
+
+        # notes property will always be a tuple of ints
+        self.notes = tuple(int(n) for n in notes)
 
     @property
-    def pitch_class(self): return int(self.notes[0]) % 12
+    def i(self): return self.notes[0]
     @property
-    def octave(self): return int(self.notes[0]) / 12
+    def f(self): return freq(self.i)
+    @property
+    def pitch_class(self): return self.i % 12
+    @property
+    def octave(self): return self.i // 12
+    @property
+    def note(self): return self.i
 
     def __add__(self, other):
         'Transpose sequence/chord.'
@@ -176,7 +182,7 @@ class NOTES(object):
     def __str__(self):
         octave = " '23456789"
         note =  ['Cn', 'C#n', 'Dn', 'D#n', 'En', 'Fn', 'F#n', 'Gn', 'G#n', 'An', 'A#n', 'Bn']
-        return ' '.join(note[int(i) % 12].replace('n', octave[int(i) / 12]) for i in self.notes).strip()
+        return ' '.join(note[i % 12].replace('n', octave[i // 12]) for i in self.notes).strip()
 
     def __array__(self): return np.array(self.notes)
     def __getitem__(self, k): return NOTES(self.notes[k])
@@ -185,7 +191,8 @@ class NOTES(object):
     def __hash__(self): return hash((NOTES, self.notes))
     def __repr__(self): return 'NOTES("%s")' % self
     def __len__(self): return len(self.notes)
-    def __index__(self): return int(self.notes[0])
+    def __index__(self): return self.i
+    def __int__(self): return self.__index__()
 
 # initialize chords from docstring!
 NOTES.chords = dict(line.strip().split(None,1)
@@ -195,7 +202,7 @@ C = N = NOTES()
 
 def freq(n):
     if isinstance(n, NOTES):
-        n = n.notes[0]
+        n = n.i
     return 440 * 2**((n - 69) / 12.0)
 
 def freq_to_note(f):
@@ -222,13 +229,13 @@ def note2i(ss):
 
 def print_note_table():
     for n in range(128):
-        print '--- sr = %d -------------------------------' % sr
+        print('--- sr = %d -------------------------------' % sr)
         if note(n)[:2] == 'C-':
-            print
-        print '%3d. %9.3f Hz -- %-4s -- SR / %-8.3f' % (n,freq(n),note(n),sr/freq(n))
+            print()
+        print('%3d. %9.3f Hz -- %-4s -- SR / %-8.3f' % (n,freq(n),note(n),sr/freq(n)))
 
 def period_sample_error(sr=sr):
-    print '--- sr = %d Hz %s' % (sr, 60 * '-')
+    print('--- sr = %d Hz %s' % (sr, 60 * '-'))
     dd=[]
     for n in range(48):
         f = freq(n)
@@ -238,7 +245,7 @@ def period_sample_error(sr=sr):
         dd.append(d)
     dd.sort()
     for d in dd:
-        print 'ERR %6.3f ct -- %3d -- %9.3f Hz -- %-4s -- %8.3f samples' % d
+        print('ERR %6.3f ct -- %3d -- %9.3f Hz -- %-4s -- %8.3f samples' % d)
 
 def min12(a,b):
     '''Minimal modulo 12 absolute difference.'''
@@ -254,5 +261,20 @@ def chord_finder(notes, size=3, tres=1):
     diffs = [(sorted((min12(a,b) for a,b in co)),n) for co,n in combb]
     for dd,nn in sorted(diffs, reverse=True):
         if dd[0] > 1:
-            print '%10s %10s' % (dd, NOTES(nn))
+            print('%10s %10s' % (dd, NOTES(nn)))
 
+def dB2p(d):
+    """Decibel to power ratio. dB2p(6.0) ~= 4.0."""
+    return 10 ** (d * .1)
+
+def a2dB(p):
+    """Amplitude ratio to decibel. a2dB(2.0) ~= 6.0."""
+    return 10 * log10(p*p)
+
+def dB2vel(d):
+    """Decibel to 7-bit MIDI velocity. dB2vel(-6.0) = 64."""
+    return int(10 ** (d * .1 * .5) * 128)
+
+def dB2rns(d):
+    """Decibel to 7-bit MIDI velocity hex string (for renoise). dB2rnd(-6.0) = '40'."""
+    return '%02X' % dB2vel(d)

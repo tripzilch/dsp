@@ -1,11 +1,32 @@
+from tripzilch.dsp import wplot
 import pylab as pl
 from scipy.io import wavfile
 import pygame
 
 tau = 2*pl.pi
+PHI=.5+.5*5**.5
+
+"Sampling rate"
 sr = 44100.0
 
-# print '''sr = %.0f Hz.''' % sr
+def dB2p(d):
+    """Decibel to power ratio. dB2p(6.0) ~= 4.0."""
+    return 10 ** (d * .1)
+
+def a2dB(p):
+    """Amplitude ratio to decibel. a2dB(2.0) ~= 6.0."""
+    return 10 * log10(p*p)
+
+def dB2vel(d):
+    """Decibel to 7-bit MIDI velocity. dB2vel(-6.0) = 64."""
+    return int(10 ** (d * .1 * .5) * 128)
+
+def dB2rns(d):
+    """Decibel to 7-bit MIDI velocity hex string (for renoise). dB2rnd(-6.0) = '40'."""
+    return '%02X' % dB2vel(d)
+
+def _ch(n):
+    return {1:'mono',2:'stereo'}[n]
 
 def a2sound(ar, level=12000.0):
     return pygame.sndarray.make_sound((level * ar).astype('int16'))
@@ -19,7 +40,7 @@ def play(ar, level=0.25):
     elif ar.ndim == 2 and ar.shape[1] == 2:
         pygame.mixer.init(frequency=int(sr), size=-16, channels=2)
     else:
-        print "ERR: array must be 1D (mono) or 2D (stereo) with two colums."
+        print("ERR: array must be 1D (mono) or 2D (stereo) with two colums.")
         return
 
     sound = pygame.sndarray.make_sound(wav_float_to_int16(ar, level * 32767))
@@ -40,27 +61,27 @@ def wav_float_to_int32(ar, level=32760 * 32760):
 def read(infile, to_mono=False):
     '''Load a WAV, normalized to 1.0, optionally converted to mono.'''
     global sr
-
-    sr_, wav = wavfile.read(infile)
-
-    if to_mono and wav.ndim == 2:
-        wav = pl.sum(wav,axis=1)
-
-    sr_ = float(sr)
-    if sr_ != sr:
-        sr = sr_
-        print '''sr = %.0f Hz.''' % sr
-
-    return normalize(wav, 1.0)
+    sr, ar = wavfile.read(infile)
+    attn = ''
+    if ar.ndim == 2:
+        if to_mono:
+            ar = pl.sum(ar, axis=1)
+            attn += ' ATTN: Converted from stereo.'
+        else:
+            attn += ' ATTN: Not mono.'
+    if sr != 44100.0:
+        attn += ' ATTN: Not 44.1kHz.'
+    print('Read %s (%.1fkHz %s).%s' % (infile, sr / 1000.0, _ch(ar.ndim), attn))
+    return normalize(ar, 1.0)
 
 def write(ar, outfile, level=32760 * 32760):
     '''Write a WAV, normalized.'''
     global sr
     wavfile.write(outfile, sr, wav_float_to_int32(ar, level))
+    print('Written %s (%.1fkHz %s).' % (outfile, sr / 1000.0, _ch(ar.ndim)))
 
 def normalize(ar, level=1.0):
     return ar * (float(level) / abs(ar).max())
-
 
 def sine(f, phi, L):
     '''Returns L samples of a sinewave of frequency f (Hz) and phase phi.'''
@@ -117,23 +138,47 @@ def asynth(f0, L, term_f = lambda f,k: f * k, term_a = lambda f,k: 1.0 / k, term
     return res
 
 def generate_waveforms(
-    N_harmonics=[8,16,32,64],
-    path='/home/ritz/mix/audio samples instruments/basic-waveforms/',
-    name='square_rnd_phase-%03dh-G2-(i).wav'):
+    N_harmonics=[256]*36, cycles=8, verbose=False,
+    name='wave-%03dh-G2-(ii).wav'):
     '''Generate a series of basic additive waveforms with a varying number of harmonics.'''
     f0 = 49.0
-    w0 = pl.round(sr / f0)
-    f0 = sr / w0
-    pl.clf()
-    for ii, N in enumerate(N_harmonics):
-        H = 1.0 + 2 * pl.arange(N)
-        waev = beep(pl.c_[f0 * H, pl.random(N) * tau, 1 / H], 8 * w0)
-        pl.subplot(3,4,ii+1)
-        pl.plot(waev)
-        write(waev, path + (name % N))
+    w0 = round(cycles * sr / f0)
+    w3 = round(min(3, cycles) * sr / f0) # plot only first three cycles
+    f0 = cycles * sr / w0
 
-def ADSR((A, D, S, R)=(100, 500, .7, 100), L=2000):
+    pl.clf()
+    NW = len(N_harmonics)
+    sqrtNW = NW ** .5
+    nc = int(pl.ceil(sqrtNW))
+    nr = int(pl.ceil(NW / nc))
+    for ii, N in enumerate(N_harmonics):
+        H = 1.0 + pl.arange(N)
+        freqs = f0 * H
+        phases = ((ii+1.0) * PHI) * (1**H)
+        phases %= 1.0
+        amps = 1 / (H**0.5)
+        waev = beep(pl.c_[freqs, tau * phases, amps], w0)
+        pre_level = abs(waev).max()
+        waev /= pre_level
+        pl.subplot(nr,nc,ii+1)
+        fn = name % N
+        pl.title('%s, pre_level = %.2f' % (fn, pre_level))
+        pl.yticks([-1,0,1]); pl.xticks([]); pl.grid(True)
+        pl.plot(waev[:w3])
+        pl.axis([0,w3,-1.1,1.1])
+        write(waev, fn) # todo: constant level
+        if verbose:
+            print("%d. %s, N = %d, pre_level = %.2f" % (ii, fn, N, pre_level))
+            print("freqs  = [ %s ]" % wplot.fmtar(freqs, num=5, fmt='%.1f'))
+            print("phases = [ %s ]" % wplot.fmtar(phases, num=5, fmt='%.3f'))
+            print("amps   = [ %s ]" % wplot.fmtar(amps, num=5, fmt='%.3f'))
+    pl.tight_layout()
+    return waev
+
+
+def ADSR(A_D_S_R=(100, 500, .7, 100), L=2000):
     'ADSR envelope.'
+    A, D, S, R = A_D_S_R
     return pl.interp(pl.arange(L), [0, A, A+D, L-R, L-1], [0, 1, S, S, 0])
 
 def saw_bass(n, L=4400, env=(100, 500, .7, 100), N_harmonics=32):
