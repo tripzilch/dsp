@@ -103,6 +103,9 @@ class NOTES(object):
 
         chromatic           C  C# D  D# E  F  F# G  G# A  A# B  C'
 
+        double_harmonic     C  Db E  F  G  Ab B  C'
+        byzantine           C  Db E  F  G  Ab B  C'
+
     ========
 
     These chords are actually specified by the above docstring. See the code
@@ -113,8 +116,6 @@ class NOTES(object):
 
         persian             C  Db E  F  Gb Ab B  C'
         oriental            C  Db E  F  Gb A  Bb C'
-        double_harmonic     C  Db E  F  G  Ab B  C'
-        byzantine           C  Db E  F  G  Ab B  C'
         major_locrian       C  D  E  F  Gb Ab Bb C'
         hindu               C  D  E  F  G  Ab Bb C'
         lydian_minor        C  D  E  F# G  Ab Bb C'
