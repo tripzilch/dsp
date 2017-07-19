@@ -10,19 +10,27 @@ PHI=.5+.5*5**.5
 sr = 44100.0
 
 def dB2p(d):
-    """Decibel to power ratio. dB2p(6.0) ~= 4.0."""
+    "Decibel to power ratio.\n\n    dB2p(6.0) ~= 4.0."
     return 10 ** (d * .1)
 
+def dB2a(d):
+    """Decibel to amplitude ratio.
+
+    dB2a(6.0) = sqrt(dB2p(6.0)) = dB2p(3.0) ~= 2.0."""
+    return dB2p(d * 0.5)
+
 def a2dB(p):
-    """Amplitude ratio to decibel. a2dB(2.0) ~= 6.0."""
-    return 10 * log10(p*p)
+    "Amplitude ratio to decibel.\n\n    a2dB(2.0) ~= 6.0."
+    return 10 * pl.log10(p*p)
 
 def dB2vel(d):
-    """Decibel to 7-bit MIDI velocity. dB2vel(-6.0) = 64."""
+    "Decibel to 7-bit MIDI velocity.\n\n    dB2vel(-6.0) = 64."
     return int(10 ** (d * .1 * .5) * 128)
 
 def dB2rns(d):
-    """Decibel to 7-bit MIDI velocity hex string (for renoise). dB2rnd(-6.0) = '40'."""
+    """Decibel to 7-bit MIDI velocity hex string (for renoise).
+
+    dB2rnd(-6.0) = '40'."""
     return '%02X' % dB2vel(d)
 
 def _ch(n):
