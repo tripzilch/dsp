@@ -24,6 +24,10 @@ def sigmoid(x, threshold=0.25, p=36):
 def elliot_sigmoid(x): return x / (1 + abs(x))
 def d_elliot_sigmoid(x): return 1 / (1 + abs(x)) ** 2
 
+def smoothstep(edge0, edge1, x):
+    x = clip((x - edge0) / (edge1 - edge0), 0.0, 1.0)    
+    return x * x * x * (x * (x * 6 - 15) + 10)
+
 def kaiser_beta(beta):
     '''Partial application of kaiser window function.'''
     f = lambda M: kaiser(M, beta)
