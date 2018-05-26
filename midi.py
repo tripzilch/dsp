@@ -127,16 +127,18 @@ class NOTES(object):
         if isinstance(notes, str):
             notes = tuple(
                 'CCDDEFFGGAAB'.index(n[0])
-                + ('#' in n) + ('s' in n)
-                - ('b' in n) - ('f' in n)
+                + ('#' in n) + ('s' in n) + ('♯' in n)
+                - ('b' in n) - ('f' in n) - ('♭' in n)
                 + 12 * (1 + "123456789".find(n[-1]))
                 for n in notes.replace("'","1").strip().split())
-        elif not hasattr(a, '__iter__'): # iterable?
+        elif not hasattr(notes, '__iter__'): # iterable?
             notes = (notes,)
 
         # notes property will always be a tuple of ints
         self.notes = tuple(int(n) for n in notes)
 
+    @property
+    def s(self): return str(self)
     @property
     def i(self): return self.notes[0]
     @property
@@ -176,13 +178,13 @@ class NOTES(object):
 
     def __getattr__(self, k):
         if k in NOTES.chords:
-            return self + NOTES.chords[k]
+            return self + NOTES(NOTES.chords[k])
         else:
             return NOTES(k)
 
     def __str__(self):
         octave = " '23456789"
-        note =  ['Cn', 'C#n', 'Dn', 'D#n', 'En', 'Fn', 'F#n', 'Gn', 'G#n', 'An', 'A#n', 'Bn']
+        note =  ['Cn', 'C♯n', 'Dn', 'D♯n', 'En', 'Fn', 'F♯n', 'Gn', 'G♯n', 'An', 'A♯n', 'Bn']
         return ' '.join(note[i % 12].replace('n', octave[i // 12]) for i in self.notes).strip()
 
     def __array__(self): return np.array(self.notes)
@@ -204,27 +206,29 @@ C = N = NOTES()
 def freq(n):
     if isinstance(n, NOTES):
         n = n.i
-    return 440 * 2**((n - 69) / 12.0)
+    return 440 * 2**((n - 57) / 12.0)
 
 def freq_to_note(f):
-    return 69 + 12 * np.log2(f / 440.0)
+    return 57 + 12 * np.log2(f / 440.0)
 
 def note(n):
     i = n
     s = i % 12
-    return 'C.C#D.D#E.F.F#G.G#A.A#B.'[s * 2: s * 2 + 2] + str(i / 12)
+    return 'C.C♯D.D♯E.F.F♯G.G♯A.A♯B.'[s * 2: s * 2 + 2] + str(i // 12)
 
 def i2note(ii):
     octave = " '23456789"
-    notes =  ['Cn', 'C#n', 'Dn', 'D#n', 'En', 'Fn', 'F#n', 'Gn', 'G#n', 'An', 'A#n', 'Bn']
-    return ' '.join(notes[int(i)%12].replace('n', octave[int(i)/12]) for i in ii)
+    notes =  ['Cn', 'C♯n', 'Dn', 'D♯n', 'En', 'Fn', 'F♯n', 'Gn', 'G♯n', 'An', 'A♯n', 'Bn']
+    return ' '.join(notes[int(i)%12].replace('n', octave[int(i)//12]) for i in ii)
 
 def note2i(ss):
     return np.array(['CCDDEFFGGAAB'.index(s[0])
         + ('#' in s)
         + ('s' in s)
+        + ('♯' in s)
         - ('b' in s)
         - ('f' in s)
+        - ('♭' in s)
         + 12 * (s[-1] == "'")
         + 12 * (s[-1].isdigit() and int(s[-1])) for s in ss.split()])
 
@@ -279,3 +283,14 @@ def dB2vel(d):
 def dB2rns(d):
     """Decibel to 7-bit MIDI velocity hex string (for renoise). dB2rnd(-6.0) = '40'."""
     return '%02X' % dB2vel(d)
+
+class Necklace(tuple):        
+    def __new__(cls, a):        
+        a = super().__new__(cls, a)
+        a = sorted(a.rot(i) for i in range(len(a)))[0]        
+        return a
+    
+    def rot(self, n):
+        n %= len(self)
+        return self[n:] + self[:n]
+        

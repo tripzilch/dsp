@@ -3,8 +3,7 @@ import numpy as np
 
 sr = 44100.0
 
-class NOTES(object):
-    """A NOTES object represent a note, or a sequence/chord of notes.
+"""A NOTES object represent a note, or a sequence/chord of notes.
 
     Initialized with no arguments produces a single C in octave 0:
 
@@ -123,30 +122,25 @@ class NOTES(object):
 
     """
 
-    def __init__(self, notes='C'):
-        if isinstance(notes, str):
-            notes = tuple(
-                'CCDDEFFGGAAB'.index(n[0])
-                + ('#' in n) + ('s' in n)
-                - ('b' in n) - ('f' in n)
-                + 12 * (1 + "123456789".find(n[-1]))
-                for n in notes.replace("'","1").strip().split())
-        elif not hasattr(a, '__iter__'): # iterable?
-            notes = (notes,)
+class Note:
+    def __init__(self, n='C'):
+        if isinstance(n, str):
+            n = n.strip()
+            n = n.replace("'","1")
+            n = n.replace("s","#")
+            n = n.replace("f","b")
+            name = n[0]
+            letter_names = 'CCDDEFFGGAAB'
+            if name not in letter_names:
+                raise ValueError("First character must be in 'CDEFGAB'.")
+            self.name = name
+            self.alteration = n.count('#') - n.count('b')
+            self.pitch_class = letter_names.index(n[0]) + self.alteration 
+            self.octave = 12 * (1 + "123456789".find(n[-1]))
+        self.n = int(n)
 
-        # notes property will always be a tuple of ints
-        self.notes = tuple(int(n) for n in notes)
-
-    @property
-    def i(self): return self.notes[0]
     @property
     def f(self): return freq(self.i)
-    @property
-    def pitch_class(self): return self.i % 12
-    @property
-    def octave(self): return self.i // 12
-    @property
-    def note(self): return self.i
 
     def __add__(self, other):
         'Transpose sequence/chord.'

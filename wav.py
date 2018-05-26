@@ -1,9 +1,12 @@
 from tripzilch.dsp import wplot
-import pylab as pl
+import numpy as np
+import matplotlib as mpl
 from scipy.io import wavfile
 import pygame
 
-tau = 2*pl.pi
+pl = np
+
+tau = 2*np.pi
 PHI=.5+.5*5**.5
 
 "Sampling rate"
