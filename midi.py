@@ -150,6 +150,13 @@ class NOTES(object):
     @property
     def note(self): return self.i
 
+    @classmethod
+    def fromHz(cls, f, sub=100):
+        n = 57 + 12 * np.log2(f / 440.0)
+        i = int(round(n))
+        f = int((n - i) * sub)
+        return cls(i), f
+
     def __add__(self, other):
         'Transpose sequence/chord.'
         return NOTES(np.array(self) + NOTES(other).notes)
