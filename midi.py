@@ -161,7 +161,7 @@ class NOTES(object):
         'Transpose sequence/chord.'
         return NOTES(np.array(self) + NOTES(other).notes)
     def __sub__(self, other):
-        'Transpose sequence/chord.'
+        'Transpose sequence/chord.' ## todo: return numerical if other is NOTES else return NOTES        
         return NOTES(np.array(self) - NOTES(other).notes)
     def __lshift__(self, other):
         'Transpose sequence/chord octave.'
